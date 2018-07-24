@@ -23,10 +23,21 @@ class GithubMailRequest extends FormRequest
      */
     public function rules()
     {
+        $this->sanitize();
+
         return [
             'usernames' => 'array|min:1',
             'usernames.*' => 'string|min:3',
             'massage' => 'required|string',
         ];
+    }
+
+    public function sanitize()
+    {
+        $input = $this->all();
+
+        $input['massage'] = filter_var($input['massage'], FILTER_SANITIZE_STRING);
+
+        $this->replace($input);
     }
 }

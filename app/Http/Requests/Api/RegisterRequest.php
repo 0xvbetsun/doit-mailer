@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Traits\AuthSanitizerTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
 {
+    use AuthSanitizerTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -23,9 +26,11 @@ class RegisterRequest extends FormRequest
      */
     public function rules()
     {
+        $this->sanitize();
+
         return [
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|max:255|confirmed',
+            'password' => 'required|string|min:6|max:255',
             'avatar' => 'image',
         ];
     }

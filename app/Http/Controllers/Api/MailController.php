@@ -9,6 +9,6 @@ class MailController extends Controller
 {
     public function byGithubUsernames()
     {
-        dd('here');
+        return response()->json(['data' => 'all mails was sent']);
     }
 }
