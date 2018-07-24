@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * Class User
+ * @package App\Models
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable
 {
     use Notifiable, SoftDeletes;

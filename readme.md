@@ -2,7 +2,7 @@
 
 ### Task
 
-- [x] Provide a link to the Git repo.
+- [x] Provide a link to the Git repo. [Here is link :)](https://github.com/VBetsun/doit-mailer)
 - [ ] Upload the code to any hosting and send an URL for testing.
 - [ ] Create API doc.
 
@@ -22,7 +22,7 @@ As a user I can:
 
 Cloning project:
 ```
-git clone github-url /path/to/project
+git clone https://github.com/VBetsun/doit-mailer.git /path/to/project
 ```
 Navigate to folder:
 ```

@@ -1,18 +1,15 @@
 <?php
+declare(strict_types=1);
 
-use Illuminate\Http\Request;
+Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function () {
+    Route::post('/login', 'SecurityController@login')->name('login');
+    Route::post('/register', 'SecurityController@register');
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+    Route::middleware('auth:api')->group(function () {
+        Route::post('/mail/github', 'MailController@byGithubUsernames');
+    });
+});
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::fallback(function(){
+    return response()->json(['message' => 'Not Found!'], 404);
 });
