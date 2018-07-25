@@ -23,6 +23,7 @@ class User extends Authenticatable
             $model->attributes['api_token'] = static::generateToken();
         });
     }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -44,6 +45,16 @@ class User extends Authenticatable
         'updated_at',
         'created_at'
     ];
+
+    public function getAvatar()
+    {
+        return sprintf('%s/storage/%s', config('app.url'), 'default.png');
+    }
+
+    public function getAvatarThumbnail()
+    {
+        return sprintf('%s/storage/%s', config('app.url'), 'default-thumbnail.png');
+    }
 
     private static function generateToken()
     {

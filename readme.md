@@ -32,6 +32,14 @@ Install packages:
 ```
 composer install
 ```
+Create a symbolic link from "public/storage" to "storage/app/public":
+```
+php artisan storage:link
+```
+Give www-data correct permissions for working:
+```
+./permissions.sh
+```
 Run built-in server:
 ```
 php artisan serve

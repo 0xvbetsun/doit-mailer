@@ -7,6 +7,7 @@ use App\Http\Requests\Api\RegisterRequest;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use DB;
+use App\Http\Resources\User as UserResource;
 
 class SecurityController extends Controller
 {
@@ -17,7 +18,8 @@ class SecurityController extends Controller
     public function login(LoginRequest $request)
     {
         $hasher = app()->make('hash');
-        $user = (new User)->where('email', '=', $request->input('email'))
+        $user = (new User)
+            ->where('email', '=', $request->input('email'))
             ->first()
         ;
 
@@ -33,7 +35,7 @@ class SecurityController extends Controller
             ], 422);
         }
 
-        return response()->json(['data' => $user]);
+        return response()->json(new UserResource($user));
     }
 
     /**
@@ -42,15 +44,17 @@ class SecurityController extends Controller
      */
     public function register(RegisterRequest $request)
     {
-        dd($request->input());
-        $result = DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, &$user) {
             $hasher = app()->make('hash');
             $user = User::create([
                 'email' => $request->input('email'),
                 'password' => $hasher->make($request->input('password'))
             ]);
+            if($request->filled('avatar')){
+                dd('asd');
+            }
         });
 
-        return response()->json(['data' => $result], 201);
+        return response()->json(new UserResource($user), 201);
     }
 }

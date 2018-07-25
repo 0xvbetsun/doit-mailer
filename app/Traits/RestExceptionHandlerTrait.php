@@ -27,22 +27,22 @@ trait RestExceptionHandlerTrait
                 $returnedValue = $this->validationFailed($e);
                 break;
             default:
-                $returnedValue = $this->badRequest();
+                $returnedValue = $this->internalServerError($e);
         }
 
         return $returnedValue;
     }
 
     /**
-     * Returns json response for generic bad request.
+     * Returns json response for internal server error.
      *
-     * @param string $message
+     * @param \Exception $exception
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function badRequest($message = 'Bad request', $statusCode = 400)
+    protected function internalServerError($exception, $statusCode = 500)
     {
-        return $this->jsonResponse(['error' => $message], $statusCode);
+        return $this->jsonResponse(['error' => $exception->getMessage()], $statusCode);
     }
 
     /**
