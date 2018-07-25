@@ -151,6 +151,8 @@ return [
          * Package Service Providers...
          */
         Intervention\Image\ImageServiceProvider::class,
+        Gmopx\LaravelOWM\LaravelOWMServiceProvider::class,
+        Collective\Html\HtmlServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -210,6 +212,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
         'Image' => Intervention\Image\ImageServiceProvider::class,
+        'Html' => Collective\Html\HtmlFacade::class,
     ],
 
 ];
