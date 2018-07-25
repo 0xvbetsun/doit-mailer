@@ -1,11 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Requests\Api;
 
+use App\Traits\InputCleaner;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Class GithubMailRequest
+ * @package App\Http\Requests\Api
+ */
 class GithubMailRequest extends FormRequest
 {
+    use InputCleaner;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,17 +34,40 @@ class GithubMailRequest extends FormRequest
         $this->sanitize();
 
         return [
-            'usernames' => 'array|min:1',
-            'usernames.*' => 'string|min:3',
-            'massage' => 'required|string',
+            'usernames' => 'required',
+            'usernames.*' => 'required|string|min:3',
+            'message' => 'required|string',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'usernames.*.required' => 'No one username in the list can\'t be empty',
         ];
     }
 
     public function sanitize()
     {
         $input = $this->all();
+        if ($this->filled('usernames')) {
+            if (!is_array($input['usernames'])) {
+                $input['usernames'] = [$this->clean($input['usernames'])];
+            } else {
+                $usernames = [];
+                foreach ($input['usernames'] as $username) {
+                    $usernames[] = $this->clean($username);
+                }
+                $input['usernames'] = $usernames;
+            }
+        }
 
-        $input['massage'] = filter_var($input['massage'], FILTER_SANITIZE_STRING);
+        if ($this->filled('message')) {
+            $input['message'] = $this->clean($input['message']);
+        }
 
         $this->replace($input);
     }

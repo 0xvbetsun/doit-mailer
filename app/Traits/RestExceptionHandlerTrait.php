@@ -1,12 +1,18 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Traits;
 
 use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Trait RestExceptionHandlerTrait
+ * @package App\Traits
+ */
 trait RestExceptionHandlerTrait
 {
 
@@ -20,6 +26,9 @@ trait RestExceptionHandlerTrait
     protected function getJsonResponseForException(Request $request, Exception $e)
     {
         switch (true) {
+            case $this->isNotAuthentificated($e):
+                $returnedValue = $this->notAuthentificated();
+                break;
             case $this->isModelNotFoundException($e):
                 $returnedValue = $this->modelNotFound();
                 break;
@@ -34,15 +43,28 @@ trait RestExceptionHandlerTrait
     }
 
     /**
-     * Returns json response for internal server error.
+     * Returns json response.
      *
-     * @param \Exception $exception
+     * @param array|null $payload
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function internalServerError($exception, $statusCode = 500)
+    protected function jsonResponse(array $payload = null, $statusCode = 200)
     {
-        return $this->jsonResponse(['error' => $exception->getMessage()], $statusCode);
+        $payload = $payload ?: [];
+
+        return response()->json($payload, $statusCode);
+    }
+
+    /**
+     * Returns json response for not authentificated error.
+     *
+     * @param int $statusCode
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function notAuthentificated($statusCode = 401)
+    {
+        return $this->jsonResponse(['message' => 'You are not authenticated in the system.'], $statusCode);
     }
 
     /**
@@ -54,7 +76,7 @@ trait RestExceptionHandlerTrait
      */
     protected function modelNotFound($message = 'Record not found', $statusCode = 404)
     {
-        return $this->jsonResponse(['error' => $message], $statusCode);
+        return $this->jsonResponse(['message' => $message], $statusCode);
     }
 
     /**
@@ -73,17 +95,26 @@ trait RestExceptionHandlerTrait
     }
 
     /**
-     * Returns json response.
+     * Returns json response for internal server error.
      *
-     * @param array|null $payload
+     * @param \Exception $exception
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function jsonResponse(array $payload = null, $statusCode = 404)
+    protected function internalServerError($exception, $statusCode = 500)
     {
-        $payload = $payload ?: [];
+        return $this->jsonResponse(['message' => $exception->getMessage()], $statusCode);
+    }
 
-        return response()->json($payload, $statusCode);
+    /**
+     * Determines if the given exception if User not authentificated .
+     *
+     * @param Exception $e
+     * @return bool
+     */
+    protected function isNotAuthentificated(Exception $e): bool
+    {
+        return $e instanceof AuthenticationException;
     }
 
     /**
@@ -92,7 +123,7 @@ trait RestExceptionHandlerTrait
      * @param Exception $e
      * @return bool
      */
-    protected function isModelNotFoundException(Exception $e)
+    protected function isModelNotFoundException(Exception $e): bool
     {
         return $e instanceof ModelNotFoundException;
     }
@@ -103,7 +134,7 @@ trait RestExceptionHandlerTrait
      * @param Exception $e
      * @return bool
      */
-    protected function isRequestValidationException(Exception $e)
+    protected function isRequestValidationException(Exception $e): bool
     {
         return $e instanceof ValidationException;
     }

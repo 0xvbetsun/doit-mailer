@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\UserAvatar;
 use DB;
 use File;
 use Image;
-use Storage;
 use App\Models\User;
+use App\Models\UserAvatar;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\LoginRequest;
 use App\Http\Requests\Api\RegisterRequest;

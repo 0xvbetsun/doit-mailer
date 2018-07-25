@@ -1,10 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Requests\Api;
 
 use App\Traits\AuthSanitizerTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Class RegisterRequest
+ * @package App\Http\Requests\Api
+ */
 class RegisterRequest extends FormRequest
 {
     use AuthSanitizerTrait;

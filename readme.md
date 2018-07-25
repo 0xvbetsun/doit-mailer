@@ -8,14 +8,14 @@
 
 ### Description
 As a user I can:
-- [ ] Sign up.
-- [ ] Sign in.
+- [x] Sign up.
+- [x] Sign in.
 - [ ] Enter GitHub usernames and send them a message through email.
 
 ### Requirements
-- [ ] Security implementation based on tokens.
-- [ ] A response in the JSON format.
-- [ ] Save avatar + thumbnail during registration.
+- [x] Security implementation based on tokens.
+- [x] A response in the JSON format.
+- [x] Save avatar + thumbnail during registration.
 - [ ] The same structure for all the responses.
 
 ### Installing
