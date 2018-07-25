@@ -1,14 +1,23 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\Api\LoginRequest;
-use App\Http\Requests\Api\RegisterRequest;
+use App\Models\UserAvatar;
+use DB;
+use File;
+use Image;
+use Storage;
 use App\Models\User;
 use App\Http\Controllers\Controller;
-use DB;
+use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\RegisterRequest;
 use App\Http\Resources\User as UserResource;
 
+/**
+ * Class SecurityController
+ * @package App\Http\Controllers\Api
+ */
 class SecurityController extends Controller
 {
     /**
@@ -50,11 +59,45 @@ class SecurityController extends Controller
                 'email' => $request->input('email'),
                 'password' => $hasher->make($request->input('password'))
             ]);
-            if($request->filled('avatar')){
-                dd('asd');
+            if ($request->file('avatar')) {
+                $file = $request->file('avatar');
+
+                $avatarName = time() . '-' . $file->getClientOriginalName();
+                $thumbnailName = 'thumbnail-'.$avatarName;
+
+                $file->move(storage_path('uploads'), $avatarName);
+                $ownerPath = "users/$user->id/";
+                $savePath = storage_path('app/public/' . $ownerPath);
+                File::makeDirectory($savePath);
+                Image::make(storage_path('uploads/' . $avatarName))
+                    ->resize(512, null, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    })
+                    ->save($savePath . $avatarName, 100)
+                ;
+                $user->avatars()->create([
+                    'name' => $avatarName,
+                    'type' => UserAvatar::TYPE_MAIN,
+                    'path' => $ownerPath
+                ]);
+
+                Image::make(storage_path('uploads/' . $avatarName))
+                    ->resize(150, null, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    })
+                    ->save($savePath . $thumbnailName, 100)
+                ;
+                $user->avatars()->create([
+                    'name' => $thumbnailName,
+                    'type' => UserAvatar::TYPE_THUMBNAIL,
+                    'path' => $ownerPath
+                ]);
             }
         });
 
         return response()->json(new UserResource($user), 201);
     }
+
 }
