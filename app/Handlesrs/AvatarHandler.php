@@ -102,7 +102,7 @@ class AvatarHandler
             'path' => $ownerPath
         ])
         ;
-        $this->user->avatars()->create([
+        $this->user->thumbnails()->create([
             'name' => $thumbnailName,
             'type' => UserAvatar::TYPE_THUMBNAIL,
             'path' => $ownerPath

@@ -140,7 +140,7 @@ class GithubUsersHandler
 
         if ($usersWithoutLocation !== []) {
             throw new \Exception(sprintf(
-                'Emails can\'t be sent because the user(s): "%s" didn\'t specify email field', implode(', ', $usersWithoutEmail)
+                'Emails can\'t be sent because the user(s): "%s" didn\'t specify location field', implode(', ', $usersWithoutEmail)
             ));
         }
     }

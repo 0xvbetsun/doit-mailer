@@ -20,16 +20,6 @@ class AvatarServiceProvider extends ServiceProvider
     protected $defer = true;
 
     /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        //
-    }
-
-    /**
      * Register services.
      *
      * @return void

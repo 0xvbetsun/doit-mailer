@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use Exception;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Trait RestExceptionHandlerTrait
@@ -35,6 +36,9 @@ trait RestExceptionHandlerTrait
                 break;
             case $this->isModelNotFoundException($e):
                 $returnedValue = $this->modelNotFound($e);
+                break;
+            case $this->isMethodNotAllowed($e):
+                $returnedValue = $this->methodNotAllowed($e);
                 break;
             case $this->isRequestValidationException($e):
                 $returnedValue = $this->validationFailed($e);
@@ -110,6 +114,23 @@ trait RestExceptionHandlerTrait
     }
 
     /**
+     * Returns json response for EMethod Not Allowed exception.
+     *
+     * @param MethodNotAllowedHttpException $exception
+     * @param string $message
+     * @param int $statusCode
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function methodNotAllowed($exception, $message = 'Method Not Allowed', $statusCode = 405)
+    {
+        return $this->jsonResponse([
+            'title' => $message,
+            'detail' => $exception->getHeaders(),
+            'status' => $statusCode
+        ], $statusCode);
+    }
+
+    /**
      * Returns json response for Validation exception.
      *
      * @param ValidationException $exception
@@ -172,6 +193,17 @@ trait RestExceptionHandlerTrait
     protected function isModelNotFoundException(Exception $e): bool
     {
         return $e instanceof ModelNotFoundException;
+    }
+
+    /**
+     * Determines if the given exception is an Eloquent model not found.
+     *
+     * @param Exception $e
+     * @return bool
+     */
+    protected function isMethodNotAllowed(Exception $e): bool
+    {
+        return $e instanceof MethodNotAllowedHttpException;
     }
 
     /**
