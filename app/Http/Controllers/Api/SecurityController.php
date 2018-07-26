@@ -62,7 +62,7 @@ class SecurityController extends Controller
                 $file = $request->file('avatar');
 
                 $avatarName = time() . '-' . $file->getClientOriginalName();
-                $thumbnailName = 'thumbnail-'.$avatarName;
+                $thumbnailName = 'thumbnail-' . $avatarName;
 
                 $file->move(storage_path('uploads'), $avatarName);
                 $ownerPath = "users/$user->id/";
@@ -79,7 +79,8 @@ class SecurityController extends Controller
                     'name' => $avatarName,
                     'type' => UserAvatar::TYPE_MAIN,
                     'path' => $ownerPath
-                ]);
+                ])
+                ;
 
                 Image::make(storage_path('uploads/' . $avatarName))
                     ->resize(150, null, function ($constraint) {
@@ -92,7 +93,8 @@ class SecurityController extends Controller
                     'name' => $thumbnailName,
                     'type' => UserAvatar::TYPE_THUMBNAIL,
                     'path' => $ownerPath
-                ]);
+                ])
+                ;
             }
         });
 

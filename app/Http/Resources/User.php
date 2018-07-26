@@ -15,8 +15,10 @@ class User extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'email' => $this->email,
+            $this->mergeWhen($request->route()->getName() === 'api_register', [
+                'id' => $this->id,
+                'email' => $this->email,
+            ]),
             'token' => $this->api_token,
             'avatar' => [
                 'main' => $this->getAvatar(),

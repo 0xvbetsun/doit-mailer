@@ -153,6 +153,7 @@ return [
         Intervention\Image\ImageServiceProvider::class,
         Gmopx\LaravelOWM\LaravelOWMServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
+        L5Swagger\L5SwaggerServiceProvider::class,
         /*
          * Application Service Providers...
          */
