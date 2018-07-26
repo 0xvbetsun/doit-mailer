@@ -150,7 +150,10 @@ return [
         /*
          * Package Service Providers...
          */
-
+        Intervention\Image\ImageServiceProvider::class,
+        Gmopx\LaravelOWM\LaravelOWMServiceProvider::class,
+        Collective\Html\HtmlServiceProvider::class,
+        L5Swagger\L5SwaggerServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -159,6 +162,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\AvatarServiceProvider::class,
+        App\Providers\GithubUsersServiceProvider::class,
 
     ],
 
@@ -209,6 +214,8 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+        'Image' => Intervention\Image\ImageServiceProvider::class,
+        'Html' => Collective\Html\HtmlFacade::class,
     ],
 
 ];

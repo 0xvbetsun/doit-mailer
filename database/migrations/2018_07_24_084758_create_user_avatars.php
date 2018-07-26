@@ -15,7 +15,7 @@ class CreateUserAvatars extends Migration
         Schema::create('user_avatars', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
-            $table->enum('type', ['image', 'thumbnail']);
+            $table->enum('type', ['main', 'thumbnail']);
             $table->string('name');
             $table->string('path');
             $table->softDeletes();
