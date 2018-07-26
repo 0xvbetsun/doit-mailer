@@ -18,7 +18,7 @@ use Swagger\Annotations as SWG;
            in the desired queries. The following syntax must
            be used in the 'Authorization' header :
 
-           Bearer: {{ token }} "
+           Bearer {{ token }}"
  *     ),
  *     @SWG\Info(
  *         version="1.0.0",
@@ -67,7 +67,9 @@ use Swagger\Annotations as SWG;
  *        ),
  *     @SWG\Definition(
  *            definition="Error",
- * 			@SWG\Property(property="message", type="string"),
+ * 			@SWG\Property(property="title", type="string", description="User friendly error"),
+ * 			@SWG\Property(property="detail", type="any", description="Error details"),
+ * 			@SWG\Property(property="status", type="number", description="HTTP status code"),
  *        ),
  * )
  */
@@ -88,16 +90,55 @@ Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function () {
      *      @SWG\Response(
      *          response=200,
      *          description="successful operation",
+     *          examples={
+     *              "application/json": {
+     *                  "token": "ZdZs5B2rAf7QpFx4Tmk5g3Bx76rMJhEfZNPhhKx1whciIBKuY8lLauy8uppW",
+     *                  "avatar": {
+     *                      "main": "APP_URL/storage/default.png",
+     *                      "thumbnail": "APP_URL/storage/default-thumbnail.png"
+     *                  },
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/LoginResponse"),
      *       ),
-     *       @SWG\Response(
-     *          response=400,
-     *          description="Bad Request",
+     *      @SWG\Response(
+     *          response=404,
+     *          description="Record Not Found",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "Record not found",
+     *                  "detail": "The user with email: admin@ukr.net doesn't exist!",
+     *                  "status" : 404
+     *              }
+     *          },
+     *          @SWG\Schema(ref="#/definitions/Error"),
+     *       ),
+     *      @SWG\Response(
+     *          response=405,
+     *          description="Method Not Allowed",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "Method Not Allowed",
+     *                  "detail": {"Allow": "POST"},
+     *                  "status" : 405
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/Error"),
      *       ),
      *       @SWG\Response(
      *          response=422,
      *          description="Validation Error",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "Validation Failed",
+     *                  "detail": {
+     *                       "email": {
+     *                           "The email must be a valid email address."
+     *                       }
+     *                   },
+     *                  "status" : 422
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/Error"),
      *        ),
      *     )
@@ -136,21 +177,57 @@ Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function () {
      *      @SWG\Response(
      *          response=201,
      *          description="Successful Operation",
+     *          examples={
+     *              "application/json": {
+     *                  "id": 2,
+     *                  "email": "user@ukr.net",
+     *                  "token": "ZdZs5B2rAf7QpFx4Tmk5g3Bx76rMJhEfZNPhhKx1whciIBKuY8lLauy8uppW",
+     *                  "avatar": {
+     *                      "main": "APP_URL/storage/default.png",
+     *                      "thumbnail": "APP_URL/storage/default-thumbnail.png"
+     *                  },
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/RegisterResponse"),
      *       ),
-     *       @SWG\Response(
-     *          response=400,
-     *          description="Bad Request",
+     *      @SWG\Response(
+     *          response=405,
+     *          description="Method Not Allowed",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "Method Not Allowed",
+     *                  "detail": {"Allow": "POST"},
+     *                  "status" : 405
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/Error"),
      *       ),
      *       @SWG\Response(
      *          response=422,
      *          description="Validation Error",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "Validation Failed",
+     *                  "detail": {
+     *                       "email": {
+     *                           "The email must be a valid email address."
+     *                       }
+     *                   },
+     *                  "status" : 422
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/Error"),
      *        ),
      *       @SWG\Response(
      *          response=500,
      *          description="Internal Server Error",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "Internal Server Error",
+     *                  "detail": "The image cannot be decoded",
+     *                  "status" : 500
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/Error"),
      *        ),
      *     )
@@ -173,16 +250,63 @@ Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function () {
      *      @SWG\Response(
      *          response=200,
      *          description="successful operation",
+     *          examples={
+     *              "application/json": {
+     *                  "message": "All emails were sent successfully"
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/LoginResponse"),
      *       ),
-     *       @SWG\Response(
-     *          response=400,
-     *          description="Bad Request",
+     *      @SWG\Response(
+     *          response=401,
+     *          description="Not Authorized",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "You are not authenticated in the system.",
+     *                  "detail": "Check if token exists in 'Authorization' header",
+     *                  "status" : 401
+     *              }
+     *          },
+     *          @SWG\Schema(ref="#/definitions/Error"),
+     *       ),
+     *      @SWG\Response(
+     *          response=405,
+     *          description="Method Not Allowed",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "Method Not Allowed",
+     *                  "detail": {"Allow": "POST"},
+     *                  "status" : 405
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/Error"),
      *       ),
      *       @SWG\Response(
      *          response=422,
      *          description="Validation Error",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "Validation Failed",
+     *                  "detail": {
+     *                       "usernames": {
+     *                           "The usernames field is required."
+     *                       }
+     *                   },
+     *                  "status" : 422
+     *              }
+     *          },
+     *          @SWG\Schema(ref="#/definitions/Error"),
+     *        ),
+     *      @SWG\Response(
+     *          response=500,
+     *          description="Internal Server Error",
+     *          examples={
+     *              "application/json": {
+     *                  "title": "Internal Server Error",
+     *                  "detail": "Open Weather Map not reachable",
+     *                  "status" : 500
+     *              }
+     *          },
      *          @SWG\Schema(ref="#/definitions/Error"),
      *        ),
      *     ),
