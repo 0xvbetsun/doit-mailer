@@ -8,6 +8,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Trait RestExceptionHandlerTrait
@@ -26,11 +27,14 @@ trait RestExceptionHandlerTrait
     protected function getJsonResponseForException(Request $request, Exception $e)
     {
         switch (true) {
+            case $this->isBadRequest($e):
+                $returnedValue = $this->badRequest($e);
+                break;
             case $this->isNotAuthentificated($e):
                 $returnedValue = $this->notAuthentificated();
                 break;
             case $this->isModelNotFoundException($e):
-                $returnedValue = $this->modelNotFound();
+                $returnedValue = $this->modelNotFound($e);
                 break;
             case $this->isRequestValidationException($e):
                 $returnedValue = $this->validationFailed($e);
@@ -57,6 +61,23 @@ trait RestExceptionHandlerTrait
     }
 
     /**
+     * Returns json response for bad request exception.
+     *
+     * @param BadRequestHttpException $exception
+     * @param string $message
+     * @param int $statusCode
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function badRequest($exception, $message = 'Bad Request', $statusCode = 400)
+    {
+        return $this->jsonResponse([
+            'title' => $message,
+            'detail' => $exception->getMessage(),
+            'status' => $statusCode
+        ], $statusCode);
+    }
+
+    /**
      * Returns json response for not authentificated error.
      *
      * @param int $statusCode
@@ -64,19 +85,28 @@ trait RestExceptionHandlerTrait
      */
     protected function notAuthentificated($statusCode = 401)
     {
-        return $this->jsonResponse(['message' => 'You are not authenticated in the system.'], $statusCode);
+        return $this->jsonResponse([
+            'title' => 'You are not authenticated in the system.',
+            'detail' => 'Check if token exists in "Authorization" header',
+            'status' => $statusCode
+        ], $statusCode);
     }
 
     /**
      * Returns json response for Eloquent model not found exception.
      *
+     * @param ModelNotFoundException $exception
      * @param string $message
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function modelNotFound($message = 'Record not found', $statusCode = 404)
+    protected function modelNotFound($exception, $message = 'Record not found', $statusCode = 404)
     {
-        return $this->jsonResponse(['message' => $message], $statusCode);
+        return $this->jsonResponse([
+            'title' => $message,
+            'detail' => $exception->getMessage(),
+            'status' => $statusCode
+        ], $statusCode);
     }
 
     /**
@@ -89,8 +119,9 @@ trait RestExceptionHandlerTrait
     protected function validationFailed($exception, $statusCode = 422)
     {
         return $this->jsonResponse([
-            'message' => 'Validation Failed',
-            'errors' => $exception->errors()
+            'title' => 'Validation Failed',
+            'detail' => $exception->errors(),
+            'status' => $statusCode
         ], $statusCode);
     }
 
@@ -103,11 +134,26 @@ trait RestExceptionHandlerTrait
      */
     protected function internalServerError($exception, $statusCode = 500)
     {
-        return $this->jsonResponse(['message' => $exception->getMessage()], $statusCode);
+        return $this->jsonResponse([
+            'title' => 'Internal Server Error',
+            'detail' => $exception->getMessage(),
+            'status' => $statusCode
+        ], $statusCode);
     }
 
     /**
-     * Determines if the given exception if User not authentificated .
+     * Determines if the given exception is bad request.
+     *
+     * @param Exception $e
+     * @return bool
+     */
+    protected function isBadRequest(Exception $e): bool
+    {
+        return $e instanceof BadRequestHttpException;
+    }
+
+    /**
+     * Determines if the given exception if User not authentificated.
      *
      * @param Exception $e
      * @return bool

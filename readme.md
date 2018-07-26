@@ -40,6 +40,10 @@ Give www-data correct permissions for working:
 ```
 ./permissions.sh
 ```
+Run tests
+```
+./vendor/bin/phpunit tests/Feature/
+```
 Run built-in server:
 ```
 php artisan serve

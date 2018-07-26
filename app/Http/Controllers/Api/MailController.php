@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\Api\GithubMailRequest;
-use App\Mail\WeatherForecast;
-use App\Traits\CurlTrait;
-use App\Http\Controllers\Controller;
 use Mail;
+use App\Traits\CurlTrait;
+use App\Mail\WeatherForecast;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\GithubMailRequest;
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class MailController
@@ -20,20 +22,22 @@ class MailController extends Controller
     /**
      * @param GithubMailRequest $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws BadRequestHttpException
+     * @throws InternalErrorException
      */
     public function byGithubUsernames(GithubMailRequest $request)
     {
-        $users = [];
-        $usersWithoutEmail = [];
-        $usersWithoutLocation = [];
+        $users = $usersWithoutEmail = $usersWithoutLocation = [];
+        $message = $request->input('message');
 
         foreach ($request->input('usernames') as $username) {
             list($basicDecodedData, $publicEventsDecodedData) = $this->prepareUserData($username);
 
             if ($this->isGithubUserNotExists($basicDecodedData)) {
-                return response()->json([
-                    'message' => sprintf('User with username "%s" doesn\'t exist on GitHub', $username)
-                ], 400);
+                throw new BadRequestHttpException(sprintf(
+                    'User with username "%s" doesn\'t exist on GitHub',
+                    $username
+                ));
             }
 
             if ($this->isGithubUserWithoutEmail($publicEventsDecodedData)) {
@@ -50,21 +54,9 @@ class MailController extends Controller
             ];
         }
 
-        if ($usersWithoutEmail !== []) {
-            return response()->json([
-                'message' => sprintf('Emails can\'t be sent because the user(s): "%s" didn\'t specify email field', implode(', ', $usersWithoutEmail))
-            ], 500);
-        }
+        $this->checkDispatchAbility($usersWithoutEmail, $usersWithoutLocation);
 
-        if ($usersWithoutLocation !== []) {
-            return response()->json([
-                'message' => sprintf('Emails can\'t be sent because the user(s): "%s" didn\'t specify location field', implode(', ', $usersWithoutLocation))
-            ], 500);
-        }
-
-        foreach ($users as $user) {
-            Mail::to($user['email'])->send(new WeatherForecast($user['location'], $request->input('message')));
-        }
+        $this->sendWeatherEmails($users, $message);
 
         return response()->json(['message' => 'All emails were sent successfully']);
     }
@@ -112,5 +104,37 @@ class MailController extends Controller
     private function isGithubUserWithoutLocation($basicDecodedData): bool
     {
         return $basicDecodedData->location === null;
+    }
+
+    /**
+     * @param array $usersWithoutEmail
+     * @param array $usersWithoutLocation
+     * @throws InternalErrorException
+     */
+    private function checkDispatchAbility($usersWithoutEmail, $usersWithoutLocation): void
+    {
+        if ($usersWithoutEmail !== []) {
+            throw new InternalErrorException(sprintf(
+                'Emails can\'t be sent because the user(s): "%s" didn\'t specify email field',
+                implode(', ', $usersWithoutEmail)
+            ));
+        }
+
+        if ($usersWithoutLocation !== []) {
+            throw new InternalErrorException(sprintf(
+                'Emails can\'t be sent because the user(s): "%s" didn\'t specify email field', implode(', ', $usersWithoutEmail)
+            ));
+        }
+    }
+
+    /**
+     * @param array $users
+     * @param string $message
+     */
+    private function sendWeatherEmails(array $users, string $message): void
+    {
+        foreach ($users as $user) {
+            Mail::to($user['email'])->send(new WeatherForecast($user['location'], $message));
+        }
     }
 }
