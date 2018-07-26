@@ -18,8 +18,6 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
-        Hash::setRounds(4);
-        \Config::set('database.default', 'sqlite');
         return $app;
     }
 

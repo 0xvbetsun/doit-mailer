@@ -6,34 +6,22 @@ namespace Tests\Feature\Common;
 use Tests\TestCase;
 
 /**
- * Class LoginTest
+ * Class RegisterTest
  * @package Tests\Feature\Common
  */
-class LoginTest extends TestCase
+class RegisterTest extends TestCase
 {
-    private $url = '/api/v1/login';
+    private $url = '/api/v1/register';
     private const CORRECT_RESPONSE_STRUCTURE = [
+        'id',
+        'email',
         'token',
         'avatar',
     ];
 
-    public function testCorrectLogin()
+    public function testCorrectRegister()
     {
-        $body = [
-            'email' => 'admin@ukr.net',
-            'password' => '12301230'
-        ];
-
-        $response = $this->json('POST', $this->url, $body);
-
-        $response->assertStatus(200)
-            ->assertJsonStructure(static::CORRECT_RESPONSE_STRUCTURE)
-        ;
-    }
-
-    public function testRestrictInvalidEmailLogin()
-    {
-        $email = 'admin@ukr.net1';
+        $email = 'user@ukr.net';
         $body = [
             'email' => $email,
             'password' => '12301230'
@@ -41,40 +29,18 @@ class LoginTest extends TestCase
 
         $response = $this->json('POST', $this->url, $body);
 
-        $response->assertStatus(404)
-            ->assertJson([
-                'title' => 'Record not found',
-                'detail' => sprintf('The user with email: "%s" doesn\'t exist!', $email),
-                'status' => 404,
-            ])
+        $response->assertStatus(201)
+            ->assertJsonStructure(static::CORRECT_RESPONSE_STRUCTURE)
         ;
+
+        $this->assertDatabaseHas('users', compact('email'));
     }
 
-    public function testRestrictInvalidPasswordLogin()
-    {
-        $body = [
-            'email' => 'admin@ukr.net',
-            'password' => '1230123'
-        ];
-
-        $response = $this->json('POST', $this->url, $body);
-
-        $response->assertStatus(422)
-            ->assertJson([
-                'title' => 'Validation Failed',
-                'detail' => [
-                    'password' => ['Password is incorrect!']
-                ],
-                'status' => 422,
-            ])
-        ;
-    }
-
-    public function testRestrictLoginWithNotValidEmail()
+    public function testRestrictRegisterWithNotValidEmail()
     {
         $body = [
             'email' => $this->getInvalidField(),
-            'password' => '1230123'
+            'password' => '12301230'
         ];
 
         $response = $this->json('POST', $this->url, $body);
@@ -90,7 +56,27 @@ class LoginTest extends TestCase
         ;
     }
 
-    public function testRestrictLoginWithEmptyData()
+    public function testRestrictRegisterWithExistedEmail()
+    {
+        $body = [
+            'email' => 'admin@ukr.net',
+            'password' => '12301230'
+        ];
+
+        $response = $this->json('POST', $this->url, $body);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'title' => 'Validation Failed',
+                'detail' => [
+                    'email' => ['The email has already been taken.']
+                ],
+                'status' => 422,
+            ])
+        ;
+    }
+
+    public function testRestrictRegisterWithEmptyData()
     {
         $body = [
             'email' => $this->getEmptyField(),

@@ -134,7 +134,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function () {
      *          type="file",
      *       ),
      *      @SWG\Response(
-     *          response=200,
+     *          response=201,
      *          description="Successful Operation",
      *          @SWG\Schema(ref="#/definitions/RegisterResponse"),
      *       ),

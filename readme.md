@@ -40,6 +40,10 @@ Give www-data correct permissions for working:
 ```
 ./permissions.sh
 ```
+Run migrations & fill DB with fake data
+```
+php artisan migrate --seed
+```
 Run tests
 ```
 ./vendor/bin/phpunit tests/Feature/

@@ -40,7 +40,8 @@ class MailController extends Controller
                 ));
             }
 
-            if ($this->isGithubUserWithoutEmail($publicEventsDecodedData)) {
+            $email = $this->getEmailFromDecodedData($basicDecodedData, $publicEventsDecodedData);
+            if (!$email) {
                 $usersWithoutEmail[] = $username;
             }
 
@@ -49,7 +50,7 @@ class MailController extends Controller
             }
 
             $users[] = [
-                'email' => $publicEventsDecodedData[0]->payload->commits[0]->author->email,
+                'email' => $email,
                 'location' => $basicDecodedData->location
             ];
         }
@@ -88,13 +89,28 @@ class MailController extends Controller
     }
 
     /**
-     * @param $publicEventsDecodedData
-     * @return bool
+     * @param $basicData
+     * @param $publicEventsData
+     * @return string|null
      */
-    private function isGithubUserWithoutEmail($publicEventsDecodedData): bool
+    private function getEmailFromDecodedData($basicData, $publicEventsData)
     {
-        return !is_array($publicEventsDecodedData) ||
-            !is_array($publicEventsDecodedData[0]->payload->commits);
+        if ($basicData->email !== null) {
+            return $basicData->email;
+        }
+
+        foreach ($publicEventsData as $data) {
+            if (property_exists($data->payload, 'commits')) {
+
+                foreach ($data->payload->commits as $commit) {
+                    if ($commit->author->email !== null) {
+                        return $commit->author->email;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
