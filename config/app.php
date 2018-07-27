@@ -108,6 +108,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'github_token' => env('GITHUB_KEY', null),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
