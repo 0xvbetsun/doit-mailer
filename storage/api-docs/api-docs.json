@@ -9,7 +9,7 @@
         },
         "version": "1.0.0"
     },
-    "host": "doit-task.loc",
+    "host": "doit-mailer.itls-ua.tk",
     "basePath": "/api/v1/",
     "schemes": [
         "http"

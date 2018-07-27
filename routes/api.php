@@ -6,7 +6,7 @@ use Swagger\Annotations as SWG;
 /**
  * @SWG\Swagger(
  *     schemes={"http"},
- *     host="doit-task.loc",
+ *     host="doit-mailer.itls-ua.tk",
  *     basePath="/api/v1/",
  *     @SWG\SecurityScheme(
  *         securityDefinition="default",

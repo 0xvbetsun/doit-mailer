@@ -14,9 +14,12 @@ trait AuthSanitizerTrait
     public function sanitize()
     {
         $input = $this->all();
-
-        $input['email'] = $this->clean($input['email']);
-        $input['password'] = $this->clean($input['password']);
+	if ($this->filled('email')) {
+            $input['email'] = $this->clean($input['email']);
+        }
+	if ($this->filled('password')) {
+            $input['password'] = $this->clean($input['password']);
+        }
 
         $this->replace($input);
     }

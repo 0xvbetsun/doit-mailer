@@ -2,21 +2,21 @@
 
 ### Task
 
-- [x] Provide a link to the Git repo. [Here is link :)](https://github.com/VBetsun/doit-mailer)
-- [ ] Upload the code to any hosting and send an URL for testing.
-- [ ] Create API doc.
+- [x] Provide a link to the Git repo. [GitHub link](https://github.com/VBetsun/doit-mailer)
+- [x] Upload the code to any hosting and send an URL for testing.[Hosting link](http://doit-mailer.itls-ua.tk)
+- [x] Create API doc.[Documentation link](http://doit-mailer.itls-ua.tk/api/documentation)
 
 ### Description
 As a user I can:
 - [x] Sign up.
 - [x] Sign in.
-- [ ] Enter GitHub usernames and send them a message through email.
+- [x] Enter GitHub usernames and send them a message through email.
 
 ### Requirements
 - [x] Security implementation based on tokens.
 - [x] A response in the JSON format.
 - [x] Save avatar + thumbnail during registration.
-- [ ] The same structure for all the responses.
+- [x] The same structure for all the responses.
 
 ### Installing
 
